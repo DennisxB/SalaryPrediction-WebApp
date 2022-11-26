@@ -30,7 +30,7 @@ def clean_education(x):
         return 'Post Grad.'
     return 'Less than Bachelor’s degree'    
 
-
+@st.cache
 def load_data():
     df = pd.read_csv('data/survey_results_public.csv')
     df = df[['Country', 'YearsCodePro', 'EdLevel', 'Employment', 'ConvertedCompYearly']]
@@ -64,9 +64,29 @@ def show_explore_page():
     data = df["Country"].value_counts()
 
     fig1, ax1 = plt.subplots()
-    ax1.plot(data, label=data.index, shadow=True, startangle=90)
-    ax1.axis("equal")
+    ax1.pie(data, labels=data.index, autopct='%1.1f%%',
+        shadow=True, startangle=90)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
 
     st.write("""#### Number of Data from different countries""")
 
     st.pyplot(fig1)
+
+    st.write(
+        """
+    ### Mean Salary Based on Country    
+    """
+    )
+
+    data = df.groupby(['Country'])['Salary'].mean().sort_values(ascending=True)
+    st.bar_chart(data)
+
+    st.write(
+        """
+    ### Mean Salary Based on Experience   
+    """
+    ) 
+
+    data = df.groupby(['YearsCodePro'])['Salary'].mean().sort_values(ascending=True)
+    st.line_chart(data)    
